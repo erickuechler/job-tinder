@@ -1,63 +1,82 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job-Swipe</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; }
-    #card-container { width: 300px; margin: auto; position: relative; }
-    .card {
-      position: absolute;
-      width: 100%;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
-    }
-    img { width: 100%; border-radius: 10px; }
-    button { margin: 10px; padding: 10px; cursor: pointer; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job-Swipe</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f7f7f7; }
+        #card-container { width: 300px; height: 400px; margin: auto; position: relative; overflow: hidden; }
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease-out;
+        }
+        img { width: 100%; border-radius: 10px 10px 0 0; }
+        h2, p { margin: 10px; }
+        .buttons { margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; }
+        .skip { background: red; color: white; }
+        .like { background: green; color: white; }
+    </style>
 </head>
 <body>
-  <h1>Job-Swipe</h1>
-  <div id="card-container"></div>
-  <button onclick="swipe('left')">⛔️ Überspringen</button>
-  <button onclick="swipe('right')">✅ Interessiert</button>
+    <h1>Job-Swipe</h1>
+    <div id="card-container"></div>
+    <div class="buttons">
+        <button class="skip" onclick="manualSwipe('left')"⛔️ Überspringen</button>
+        <button class="like" onclick="manualSwipe('right')">✅ Interessiert</button>
+    </div>
 
-  <script>
-    let jobs = [
-      { title: "Softwareentwickler", location: "Berlin", img: "https://source.unsplash.com/300x400/?tech" },
-      { title: "Grafikdesigner", location: "München", img: "https://source.unsplash.com/300x400/?design" },
-      { title: "Marketing Manager", location: "Hamburg", img: "https://source.unsplash.com/300x400/?business" }
-    ];
-    let index = 0;
-    
-    function loadJob() {
-      if (index < jobs.length) {
-        let job = jobs[index];
-        document.getElementById("card-container").innerHTML = `
-          <div class="card">
-            <img src="${job.img}" alt="Job">
-            <h2>${job.title}</h2>
-            <p>${job.location}</p>
-          </div>
-        `;
-      } else {
-        document.getElementById("card-container").innerHTML = "<p>Keine Jobs mehr!</p>";
-      }
-    }
-    
-    function swipe(direction) {
-      if (index < jobs.length) {
-        console.log(`${jobs[index].title} wurde ${direction === 'left' ? 'übersprungen' : 'gemocht'}!`);
-        index++;
+    <script>
+        let jobs = [
+            { title: "Softwareentwickler", location: "Berlin", img: "https://source.unsplash.com/300x400/?tech" },
+            { title: "Grafikdesigner", location: "München", img: "https://source.unsplash.com/300x400/?design" },
+            { title: "Marketing Manager", location: "Hamburg", img: "https://source.unsplash.com/300x400/?business" }
+        ];
+        let index = 0;
+
+        function loadJob() {
+            if (index < jobs.length) {
+                let job = jobs[index];
+                let cardContainer = document.getElementById("card-container");
+                cardContainer.innerHTML = `
+                    <div class="card">
+                        <img src="${job.img}" alt="Job">
+                        <h2>${job.title}</h2>
+                        <p>${job.location}</p>
+                    </div>
+                `;
+                let card = document.querySelector(".card");
+                let hammer = new Hammer(card);
+
+                hammer.on("swipeleft", function () { swipe("left"); });
+                hammer.on("swiperight", function () { swipe("right"); });
+            } else {
+                document.getElementById("card-container").innerHTML = "<p>Keine Jobs mehr!</p>";
+            }
+        }
+
+        function swipe(direction) {
+            console.log(`Job "${jobs[index].title}" wurde ${direction === 'left' ? 'übersprungen' : 'gemocht'}!`);
+            index++;
+            loadJob();
+        }
+
+        function manualSwipe(direction) {
+            swipe(direction);
+        }
+
         loadJob();
-      }
-    }
-    
-    loadJob();
-  </script>
+    </script>
 </body>
 </html>
